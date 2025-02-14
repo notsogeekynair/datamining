@@ -11,7 +11,7 @@ cat("Number of duplicate rows:", nrow(df[duplicated(df), ]))
 
 # Check the number of missing values in each column
 sapply(df, function(x) sum(is.na(x)))
-
+head(df)
 # Remove the columns with more than 80% of missing values
 drop_columns <- names(which(colMeans(is.na(df)) > 0.8))
 drop_columns
