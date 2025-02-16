@@ -5,13 +5,15 @@ sapply(df, class)
 
 df <- df[, !(names(df) %in% c("SERIALNO"))]
 
+unique(df$PERNP)
+
 # DATA CLEANING
 # Check for duplicate rows
 cat("Number of duplicate rows:", nrow(df[duplicated(df), ]))
 
 # Check the number of missing values in each column
 sapply(df, function(x) sum(is.na(x)))
-head(df)
+
 # Remove the columns with more than 80% of missing values
 drop_columns <- names(which(colMeans(is.na(df)) > 0.8))
 drop_columns
@@ -21,7 +23,7 @@ dim(df)
 sapply(df, function(x) sum(is.na(x)))
 
 impute_map <- list(
-  COW = 0, POVPIP = -1, JWRIP = 0, ENG = 0, PERNP = -1,
+  COW = 0, POVPIP = -1, JWRIP = 0, ENG = 0, PERNP = 0,
   JWMNP = 0, FER = 0, SCIENGRLP = 0, WKHP = 0, GCL = 0, SCIENGP = 0, MARHYP = -1,
   RC = -1, WKWN = 0, POWSP = 0, YOEP = -1, MARHD = 0, POWPUMA = 0,
   MARHM = 0, PAOC = 0, MARHT = 0, OC = -1, MARHW = 0, MIL = 0,
@@ -91,10 +93,13 @@ df_long <- melt(df[, numeric_columns])
 
 ggplot(df_long, aes(x = variable, y = value)) +
   geom_boxplot(outlier.size = 1) +
-  scale_y_continuous(trans = 'pseudo_log') +
+  facet_wrap(~ variable, scales = "free_y") +
   theme_minimal() +
-  labs(x = "Variables", y = "Values", title = "Boxplots of Numeric Variables")
-
+  labs(x = "Variables", y = "Values", title = "Boxplots of Numeric Variables") +
+  theme(
+    axis.text.x = element_blank(),  # Removes x-axis labels
+    axis.ticks.x = element_blank()  # Removes x-axis ticks
+  )
 
 
 for (col in names(df)[numeric_columns]) {
@@ -111,7 +116,7 @@ for (col in names(df)[numeric_columns]) {
   cat(paste("Column:", col, "- Outliers:", outlier_count, "\n"))
 }
 
-outlier_cols_handle <- c("PWGTP", "WAGP", "PERNP", "PINCP")
+outlier_cols_handle <- c("WAGP", "PERNP", "PINCP")
 
 # Handle the outliers based on IQR (assign them to lower or upper bounds)
 for (col in outlier_cols_handle) {
@@ -130,19 +135,49 @@ df_long <- melt(df[, numeric_columns])
 
 ggplot(df_long, aes(x = variable, y = value)) +
   geom_boxplot(outlier.size = 1) +
-  scale_y_continuous(trans = 'pseudo_log') +
+  facet_wrap(~ variable, scales = "free_y") +
   theme_minimal() +
-  labs(x = "Variables", y = "Values", title = "Boxplots of Numeric Variables")
+  labs(x = "Variables", y = "Values", title = "Boxplots of Numeric Variables") +
+  theme(
+    axis.text.x = element_blank(),  # Removes x-axis labels
+    axis.ticks.x = element_blank()  # Removes x-axis ticks
+  )
 
 sapply(df, class)
 
+# BINNING
+#SPORDER - keep as it is
+#PWGTP - apparently it is not physical weight
+#JWRIP - no need for binning, only 11 values
 
-h <- hist(df$PWGTP, breaks=5, plot=FALSE)
+
+
+h <- hist(df$JWMNP, breaks=5, plot=FALSE)
 h$breaks
 
-df$PWGTP <- as.numeric(cut(df$PWGTP, breaks=4, labels=c(0, 1, 2, 3)))
-df$PWGTP
-hist(df$PWGTP)
+hist(df$JWMNP)
+unique(df$JWMNP)
+df$JWMNP
+
+df$JWMNP <- ifelse(df$JWMNP == 0, 0,
+                           ifelse(df$JWMNP >= 1 & df$JWMNP <= 10, 1,
+                           ifelse(df$JWMNP > 10 & df$JWMNP <= 30, 2,
+                           ifelse(df$JWMNP > 30 & df$JWMNP <= 60, 3,
+                           ifelse(df$JWMNP > 60 & df$JWMNP <= 100, 4,
+                           ifelse(df$JWMNP > 100 & df$JWMNP <= 200, 5,
+                           ifelse(df$JWMNP == 888, 6, NA)))))))
+
+hist(df$JWRIP)
+
+hist(df$WAGP)
+unique(df$WAGP)
+
+df$WAGP <- ifelse(df$WAGP == 0, 0,
+           ifelse(df$WAGP <= 20000, 1,
+           ifelse(df$WAGP <= 50000, 2,
+           ifelse(df$WAGP <= 100000, 3,
+           ifelse(df$WAGP <= 150000, 4, 5)))))
+df$WAGP
 
 library(dplyr)
 df <- df %>%
@@ -160,3 +195,8 @@ df <- df %>%
 
 table(df$NWLK[is.na(df$NWAB)])
 unique(df$OCCP)
+
+
+df$PERNP
+
+dim(df)
