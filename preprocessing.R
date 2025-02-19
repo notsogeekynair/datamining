@@ -1,12 +1,17 @@
 # IMPORT LIBRARIES
 install.packages("caret")
 install.packages("reshape2")
+install.packages("ggplot2")
+install.packages("corrplot")
 library(caret)
 library(reshape2)
 library(ggplot2)
+library(corrplot)
 
 # LOAD AND INSPECT DATA
+# Load the dataset
 df <- read.csv('project_data.csv')
+# Check dimensions
 dim(df)
 head(df)
 
@@ -85,10 +90,12 @@ df <- df[, !(names(df) %in% low_var_col)]
 dim(df)
 
 # OUTLIERS HANDLING
-# Visualize numeric data with boxplots
+# Save only numeric columns into numeric_columns
 numeric_columns <- sapply(df, is.numeric)
+# Convert data into long-format data
 df_long <- melt(df[, numeric_columns])
 
+# Visualize numeric data with boxplots
 ggplot(df_long, aes(x = variable, y = value)) +
   geom_boxplot(outlier.size = 1) +
   facet_wrap(~ variable, scales = "free_y") +
@@ -132,7 +139,6 @@ ggplot(df_long, aes(x = variable, y = value)) +
   labs(x = "Variables", y = "Values", title = "Boxplots of Numeric Variables") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
-
 # BINNING
 # Inspect the numeric columns and bin if necessary
 # For JWMNP
@@ -141,6 +147,7 @@ hist(df$JWMNP,
      main = "Distribution of JWMNP", 
      xlab = "Travel Time to Work (minutes)")
 
+# Bin the values
 df$JWMNP <- ifelse(df$JWMNP == 0, 0, # Not a worker or worked from home
             ifelse(df$JWMNP >= 1 & df$JWMNP <= 10, 1, # Short commute
             ifelse(df$JWMNP > 10 & df$JWMNP <= 30, 2, # Moderate commute
@@ -165,6 +172,7 @@ hist(df$WAGP,
      main = "Distribution of WAGP", 
      xlab = "Wages or Salary Income")
 
+# Bin the values
 df$WAGP <- ifelse(df$WAGP == 0, 0, # No income
            ifelse(df$WAGP <= 20000, 1, # Low income
            ifelse(df$WAGP <= 50000, 2, # Lower-middle income
@@ -187,6 +195,7 @@ hist(df$WKHP,
      main = "Distribution of WKHP", 
      xlab = "Usual Hours Worked Per Week")
 
+# Bin the values
 df$WKHP <- ifelse(df$WKHP == 0, 0,  # Less than 16 years old/did not work during the past 12 months
            ifelse(df$WKHP >= 1 & df$WKHP <= 20, 1,  # Between 1 and 20 hours
            ifelse(df$WKHP > 20 & df$WKHP <= 40, 2,  # Between 20 and 40 hours
@@ -210,6 +219,7 @@ hist(df$WKWN,
      main = "Distribution of WKWN", 
      xlab = "Weeks Worked")
 
+# Bin the values
 df$WKWN <- ifelse(df$WKWN == 0, 0,  # Less than 16 years old/did not work during the past 12 months
            ifelse(df$WKWN >= 1 & df$WKWN <= 13, 1,  # 1-13 weeks (1st quarter)
            ifelse(df$WKWN > 13 & df$WKWN <= 26, 2,  # 14-26 weeks (2nd quarter)
@@ -233,6 +243,7 @@ hist(df$PERNP,
      main = "Distribution of PERNP", 
      xlab = "Total Person's Earnings")
 
+# Bin the values
 df$PERNP<- ifelse(df$PERNP == 0,0,  # No earnings
            ifelse(df$PERNP == -10000, 1,  # Significant loss
            ifelse(df$PERNP >= -9999 & df$PERNP <= -1, 2,  # Small losses
@@ -257,6 +268,7 @@ hist(df$PINCP,
      main = "Distribution of PINCP", 
      xlab = "Total Person's Income")
 
+# Bin the values
 df$PINCP <- ifelse(df$PINCP == 0, 0,  # No income
             ifelse(df$PINCP == -19998, 1,  # Loss of $19,998 or more
             ifelse(df$PINCP >= -19997 & df$PINCP <= -1, 2,  # Losses between $1 and $19,997
@@ -281,6 +293,7 @@ hist(df$POVPIP,
      main = "Distribution of POVPIP", 
      xlab = "Income-to-Poverty Ratio")
 
+# Bin the values
 df$POVPIP <- ifelse(df$POVPIP == -1, 0,  # Under 15 years
              ifelse(df$POVPIP >= 0 & df$POVPIP <= 99, 1,  # 0 to 99% of the poverty level
              ifelse(df$POVPIP >= 100 & df$POVPIP <= 199, 2,  # 100 to 199% of the poverty level
@@ -298,3 +311,35 @@ barplot(table(df$POVPIP),
         main = "Binned POVPIP", 
         xlab = "Income-to-Poverty Ratio Category",
         las = 2)
+
+# CLASS DISTRIBUTION
+# Check how the classes are distributed
+table(df$Class)
+# Check how the classes are distributed (% wise)
+prop.table(table(df$Class))
+
+# Visualize class distribution
+ggplot(df, aes(x = Class, fill = Class)) +
+  geom_bar() +
+  scale_fill_manual(values = c("steelblue", "orange")) +
+  theme_minimal() +
+  labs(title = "Class Distribution", x = "Class", y = "Count") +
+  theme(legend.title = element_blank())
+
+# COLLINEARITY
+# Select only numeric columns
+numeric_columns <- sapply(df, is.numeric)
+numeric_df <- df[, numeric_columns]
+
+# Compute correlation matrix
+corr <- cor(numeric_df)
+
+# Visualize correlations
+corrplot(corr, method = "color", type = "upper", tl.cex = 0.7)
+
+# Find highly correlated features (cutoff 0.7)
+highCorr <- findCorrelation(corr, cutoff = 0.7, names = TRUE)
+cat("Highly Correlated Features:", highCorr, "\n")
+
+# SAVE PREPROCESSED DATASET
+write.csv(df, "preprocessed_data.csv", row.names = FALSE)
