@@ -352,8 +352,6 @@ write.csv(df, "preprocessed_data.csv", row.names = FALSE)
 
 install.packages("caTools")
 library(caTools)
-
-<<<<<<< HEAD
 # Function to convert all columns to numeric except 'Class'
 cols_to_numeric <- function(data, exclude_col = "Class") {
   cols_to_convert <- setdiff(names(data), exclude_col)
@@ -368,7 +366,6 @@ df <- cols_to_numeric(df, exclude_col = "Class")
 
 # Convert Class column: "Yes" -> 1, "No" -> 0 and ensure it's numeric
 df$Class <- ifelse(df$Class == "Yes", 1, 0)
-=======
 # Load the preprocessed dataset
 df_prep <- df
 df_prep
@@ -387,7 +384,6 @@ convert_columns_to_numeric <- function(data, exclude_col = "Class") {
 
 # Apply function to df_prep
 df_prep <- convert_columns_to_numeric(df_prep, exclude_col = "Class")
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 
 # Set seed for reproducibility
 set.seed(123)
@@ -459,13 +455,10 @@ table(train_data_oversampled$Class)
 
 # Balancing Method 2 (Undersampling)
 # Get the class distribution
-<<<<<<< HEAD
 install.packages("ROSE")
 library(ROSE)
 minority_class_size <- min(class_counts)  # Find the minority class count
-=======
 min_class_size <- min(class_counts)# Find the minority class count
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 
 # Apply undersampling: Reduce majority class to match the minority class
 train_data_undersampled <- ovun.sample(Class ~ ., 
@@ -563,38 +556,33 @@ apply_lasso_feature_selection <- function(data) {
   data$Class <- as.factor(data$Class)
   
   # Convert factor variables to numeric (direct mapping)
-<<<<<<< HEAD
   factor_columns <- sapply(data, is.factor)  # Identify factor columns
   data[factor_columns] <- lapply(data[factor_columns], as.numeric)  # Convert factors to numbers
   
   # Separate features (X) and target (y)
   X <- as.matrix(data[, -which(names(data) == "Class")])  # Exclude target
   y <- as.numeric(data$Class) - 1  # Convert target to binary (0/1)
-=======
+
   factor_columns <- sapply(data, is.factor)# Identify factor columns
   data[factor_columns] <- lapply(data[factor_columns], as.numeric)# Convert factors to numbers
   
   # Separate features (X) and target (y)
   X <- as.matrix(data[, -which(names(data) == "Class")])# Exclude target
   y <- as.numeric(data$Class) - 1# Convert target to binary (0/1)
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
   
   # Fit cross-validated Lasso logistic regression
   set.seed(123)# For reproducibility
   cv_model <- cv.glmnet(
     X, 
     y, 
-<<<<<<< HEAD
     family = "binomial",  # For binary classification
     alpha = 1,            # Lasso penalty (L1 regularization)
     type.measure = "class",  # Classification error as metric
-    standardize = TRUE    # Standardize features
-=======
+    standardize = TRUE,    # Standardize features
     family = "binomial",# For binary classification
     alpha = 1,# Lasso penalty (L1 regularization)
     type.measure = "class",# Classification error as metric
     standardize = TRUE# Standardize features
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
   )
   
   # Extract non-zero coefficients at lambda.min (most predictive features)
@@ -610,25 +598,20 @@ apply_lasso_feature_selection <- function(data) {
 # Apply function to oversampled data
 lasso_oversampled <- apply_lasso_feature_selection(train_data_oversampled)
 selected_features_lasso_oversampled <- lasso_oversampled$selected_features
-<<<<<<< HEAD
 length(selected_features_lasso_oversampled)
-=======
 selected_features_lasso_oversampled
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
+
 
 # Apply function to undersampled data
 lasso_undersampled <- apply_lasso_feature_selection(train_data_undersampled)
 selected_features_lasso_undersampled <- lasso_undersampled$selected_features
-<<<<<<< HEAD
 length(selected_features_lasso_undersampled)
-=======
 selected_features_lasso_undersampled
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
+
 
 
 
 # Create datasets
-<<<<<<< HEAD
 # Select only the columns in selected_features_info_gain_oversampled + Class column
 df1 <- train_data_oversampled[, c(selected_features_info_gain_oversampled, "Class"), drop = FALSE]
 dim(df1)
@@ -665,7 +648,6 @@ dim(df6_test)
 # Build models
 # Logistic Regression
 
-=======
 # Select only the columns in selected_features_info_gain_oversampled
 # Select only the chosen features + Class column
 df1 <- train_data_oversampled[, c(selected_features_info_gain_oversampled, "Class"), drop = FALSE]# Info Gain training Dataset - oversampled
@@ -701,8 +683,6 @@ dim(df6_test)
 # Build models
 # Logistic Regression
 
-
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 # Install required packages if not already installed
 if (!require("caret")) install.packages("caret", dependencies = TRUE)
 if (!require("pROC")) install.packages("pROC", dependencies = TRUE)
@@ -748,11 +728,8 @@ evaluate_model <- function(model, test_data, model_name) {
       1 - conf_matrix$byClass["Sensitivity"], 
       conf_matrix$byClass["Precision"], 
       conf_matrix$byClass["F1"], 
-<<<<<<< HEAD
       NA,  # ROC AUC is the same for both classes
-=======
-      NA,  # ROC AUC is the same for both classes
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
+      NA,# ROC AUC is the same for both classes
       mcc(actual, predicted), 
       conf_matrix$overall["Kappa"]
     ),
@@ -1184,7 +1161,7 @@ evaluate_model(nb_model5, df5_test, "Naive Bayes - df5", "nb")
 nb_model6 <- naive_bayes(Class ~ ., data = df6)
 evaluate_model(nb_model6, df6_test, "Naive Bayes - df6", "nb")
 
-=======
+
 
 # Evaluate models using corresponding test datasets
 metrics_df1 <- evaluate_model(model_df1, df1_test, "df1 (Info Gain Oversampled)")
@@ -1193,4 +1170,4 @@ metrics_df3 <- evaluate_model(model_df3, df3_test, "df3 (Boruta Oversampled)")
 metrics_df4 <- evaluate_model(model_df4, df4_test, "df4 (Boruta Undersampled)")
 metrics_df5 <- evaluate_model(model_df5, df5_test, "df5 (LASSO Oversampled)")
 metrics_df6 <- evaluate_model(model_df6, df6_test, "df6 (LASSO Undersampled)")
->>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
+
