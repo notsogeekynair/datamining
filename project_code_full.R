@@ -15,6 +15,7 @@ df <- read.csv('project_data.csv')
 dim(df)
 head(df)
 
+
 # Remove SERIALNO
 df <- df[, !(names(df) %in% c("SERIALNO"))]
 
@@ -196,12 +197,12 @@ hist(df$WKHP,
      xlab = "Usual Hours Worked Per Week")
 
 # Bin the values
-df$WKHP <- ifelse(df$WKHP == 0, 0,  # Less than 16 years old/did not work during the past 12 months
-                  ifelse(df$WKHP >= 1 & df$WKHP <= 20, 1,  # Between 1 and 20 hours
-                         ifelse(df$WKHP > 20 & df$WKHP <= 40, 2,  # Between 20 and 40 hours
-                                ifelse(df$WKHP > 40 & df$WKHP <= 60, 3,  # Between 40 and 60 hours
-                                       ifelse(df$WKHP > 60 & df$WKHP <= 98, 4,  # Between 60 and 98 hours
-                                              ifelse(df$WKHP >= 99, 5, NA))))))  # 99 or more hours
+df$WKHP <- ifelse(df$WKHP == 0, 0,# Less than 16 years old/did not work during the past 12 months
+                  ifelse(df$WKHP >= 1 & df$WKHP <= 20, 1,# Between 1 and 20 hours
+                         ifelse(df$WKHP > 20 & df$WKHP <= 40, 2,# Between 20 and 40 hours
+                                ifelse(df$WKHP > 40 & df$WKHP <= 60, 3,# Between 40 and 60 hours
+                                       ifelse(df$WKHP > 60 & df$WKHP <= 98, 4,# Between 60 and 98 hours
+                                              ifelse(df$WKHP >= 99, 5, NA))))))# 99 or more hours
 
 # Convert to factor
 df$WKHP <- factor(df$WKHP, 
@@ -220,12 +221,12 @@ hist(df$WKWN,
      xlab = "Weeks Worked")
 
 # Bin the values
-df$WKWN <- ifelse(df$WKWN == 0, 0,  # Less than 16 years old/did not work during the past 12 months
-                  ifelse(df$WKWN >= 1 & df$WKWN <= 13, 1,  # 1-13 weeks (1st quarter)
-                         ifelse(df$WKWN > 13 & df$WKWN <= 26, 2,  # 14-26 weeks (2nd quarter)
-                                ifelse(df$WKWN > 26 & df$WKWN <= 39, 3,  # 27-39 weeks (3rd quarter)
-                                       ifelse(df$WKWN > 39 & df$WKWN <= 51, 4,  # 40-51 weeks (almost full year)
-                                              ifelse(df$WKWN == 52, 5, NA))))))  # 52 weeks (full year)
+df$WKWN <- ifelse(df$WKWN == 0, 0,# Less than 16 years old/did not work during the past 12 months
+                  ifelse(df$WKWN >= 1 & df$WKWN <= 13, 1,# 1-13 weeks (1st quarter)
+                         ifelse(df$WKWN > 13 & df$WKWN <= 26, 2,# 14-26 weeks (2nd quarter)
+                                ifelse(df$WKWN > 26 & df$WKWN <= 39, 3,# 27-39 weeks (3rd quarter)
+                                       ifelse(df$WKWN > 39 & df$WKWN <= 51, 4,# 40-51 weeks (almost full year)
+                                              ifelse(df$WKWN == 52, 5, NA))))))# 52 weeks (full year)
 
 # Convert to factor
 df$WKWN <- factor(df$WKWN, 
@@ -244,13 +245,13 @@ hist(df$PERNP,
      xlab = "Total Person's Earnings")
 
 # Bin the values
-df$PERNP<- ifelse(df$PERNP == 0,0,  # No earnings
-                  ifelse(df$PERNP == -10000, 1,  # Significant loss
-                         ifelse(df$PERNP >= -9999 & df$PERNP <= -1, 2,  # Small losses
-                                ifelse(df$PERNP >= 1 & df$PERNP <= 10000, 3,  # Low earners
-                                       ifelse(df$PERNP > 10000 & df$PERNP <= 50000, 4,  # Middle earners
-                                              ifelse(df$PERNP > 50000 & df$PERNP <= 200000, 5,  # High earners
-                                                     ifelse(df$PERNP > 200000, 6, NA)))))))  # Very high earners
+df$PERNP<- ifelse(df$PERNP == 0,0,# No earnings
+                  ifelse(df$PERNP == -10000, 1,# Significant loss
+                         ifelse(df$PERNP >= -9999 & df$PERNP <= -1, 2,# Small losses
+                                ifelse(df$PERNP >= 1 & df$PERNP <= 10000, 3,# Low earners
+                                       ifelse(df$PERNP > 10000 & df$PERNP <= 50000, 4,# Middle earners
+                                              ifelse(df$PERNP > 50000 & df$PERNP <= 200000, 5,# High earners
+                                                     ifelse(df$PERNP > 200000, 6, NA)))))))# Very high earners
 
 # Convert to factor
 df$PERNP <- factor(df$PERNP,
@@ -269,12 +270,12 @@ hist(df$PINCP,
      xlab = "Total Person's Income")
 
 # Bin the values
-df$PINCP <- ifelse(df$PINCP == 0, 0,  # No income
-                   ifelse(df$PINCP == -19998, 1,  # Loss of $19,998 or more
-                          ifelse(df$PINCP >= -19997 & df$PINCP <= -1, 2,  # Losses between $1 and $19,997
-                                 ifelse(df$PINCP >= 1 & df$PINCP <= 10000, 3,  # Low income
-                                        ifelse(df$PINCP > 10000 & df$PINCP <= 50000, 4,  # Lower middle income
-                                               ifelse(df$PINCP > 50000 & df$PINCP <= 100000, 5,  # Middle to upper middle income
+df$PINCP <- ifelse(df$PINCP == 0, 0,# No income
+                   ifelse(df$PINCP == -19998, 1,# Loss of $19,998 or more
+                          ifelse(df$PINCP >= -19997 & df$PINCP <= -1, 2,# Losses between $1 and $19,997
+                                 ifelse(df$PINCP >= 1 & df$PINCP <= 10000, 3,# Low income
+                                        ifelse(df$PINCP > 10000 & df$PINCP <= 50000, 4,# Lower middle income
+                                               ifelse(df$PINCP > 50000 & df$PINCP <= 100000, 5,# Middle to upper middle income
                                                       ifelse(df$PINCP > 100000 & df$PINCP <= 4209995, 6, NA))))))) # High income
 
 # Convert to factor
@@ -294,13 +295,13 @@ hist(df$POVPIP,
      xlab = "Income-to-Poverty Ratio")
 
 # Bin the values
-df$POVPIP <- ifelse(df$POVPIP == -1, 0,  # Under 15 years
-                    ifelse(df$POVPIP >= 0 & df$POVPIP <= 99, 1,  # 0 to 99% of the poverty level
-                           ifelse(df$POVPIP >= 100 & df$POVPIP <= 199, 2,  # 100 to 199% of the poverty level
-                                  ifelse(df$POVPIP >= 200 & df$POVPIP <= 299, 3,  # 200 to 299% of the poverty level
-                                         ifelse(df$POVPIP >= 300 & df$POVPIP <= 399, 4,  # 300 to 399% of the poverty level
-                                                ifelse(df$POVPIP >= 400 & df$POVPIP <= 500, 5,  # 400 to 500% of the poverty level
-                                                       ifelse(df$POVPIP == 501, 6, NA)))))))  # 501% or more of the poverty level
+df$POVPIP <- ifelse(df$POVPIP == -1, 0,# Under 15 years
+                    ifelse(df$POVPIP >= 0 & df$POVPIP <= 99, 1,# 0 to 99% of the poverty level
+                           ifelse(df$POVPIP >= 100 & df$POVPIP <= 199, 2,# 100 to 199% of the poverty level
+                                  ifelse(df$POVPIP >= 200 & df$POVPIP <= 299, 3,# 200 to 299% of the poverty level
+                                         ifelse(df$POVPIP >= 300 & df$POVPIP <= 399, 4,# 300 to 399% of the poverty level
+                                                ifelse(df$POVPIP >= 400 & df$POVPIP <= 500, 5,# 400 to 500% of the poverty level
+                                                       ifelse(df$POVPIP == 501, 6, NA)))))))# 501% or more of the poverty level
 
 # Convert to factor
 df$POVPIP <- factor(df$POVPIP,
@@ -352,6 +353,7 @@ write.csv(df, "preprocessed_data.csv", row.names = FALSE)
 install.packages("caTools")
 library(caTools)
 
+<<<<<<< HEAD
 # Function to convert all columns to numeric except 'Class'
 cols_to_numeric <- function(data, exclude_col = "Class") {
   cols_to_convert <- setdiff(names(data), exclude_col)
@@ -366,6 +368,26 @@ df <- cols_to_numeric(df, exclude_col = "Class")
 
 # Convert Class column: "Yes" -> 1, "No" -> 0 and ensure it's numeric
 df$Class <- ifelse(df$Class == "Yes", 1, 0)
+=======
+# Load the preprocessed dataset
+df_prep <- df
+df_prep
+# Function to convert all columns to numeric except 'Class'
+convert_columns_to_numeric <- function(data, exclude_col = "Class") {
+  # Identify columns to convert (all except 'Class')
+  cols_to_convert <- setdiff(names(data), exclude_col)
+  
+  # Convert selected columns to numeric
+  for (col in cols_to_convert) {
+    data[[col]] <- as.numeric(as.factor(data[[col]]))# Convert to factor first, then numeric
+  }
+  
+  return(data)
+}
+
+# Apply function to df_prep
+df_prep <- convert_columns_to_numeric(df_prep, exclude_col = "Class")
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 
 # Set seed for reproducibility
 set.seed(123)
@@ -437,9 +459,13 @@ table(train_data_oversampled$Class)
 
 # Balancing Method 2 (Undersampling)
 # Get the class distribution
+<<<<<<< HEAD
 install.packages("ROSE")
 library(ROSE)
 minority_class_size <- min(class_counts)  # Find the minority class count
+=======
+min_class_size <- min(class_counts)# Find the minority class count
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 
 # Apply undersampling: Reduce majority class to match the minority class
 train_data_undersampled <- ovun.sample(Class ~ ., 
@@ -473,7 +499,7 @@ ggplot(sorted_info_gain_oversampled, aes(x = seq_along(importance), y = importan
   labs(title = "Information Gain Scree Plot", x = "Feature Rank", y = "Information Gain") +
   theme_minimal()
 
-N <- 15  # Keep top 15 features based on the elbow
+N <- 15  # Keep top 15 features based on the elbow
 selected_features_info_gain_oversampled <- sorted_info_gain_oversampled[1:N, "attributes"]
 length(selected_features_info_gain_oversampled)
 
@@ -492,7 +518,7 @@ ggplot(sorted_info_gain_undersampled, aes(x = seq_along(importance), y = importa
   labs(title = "Information Gain Scree Plot", x = "Feature Rank", y = "Information Gain") +
   theme_minimal()
 
-N <- 15  # Keep top 15 features based on the elbow
+N <- 15# Keep top 15 features based on the elbow
 selected_features_info_gain_undersampled <- sorted_info_gain_undersampled[1:N, "attributes"]
 length(selected_features_info_gain_undersampled)
 
@@ -502,7 +528,7 @@ library(Boruta)
 
 # For oversampled
 # Run Boruta for feature selection
-set.seed(123)  # Ensure reproducibility
+set.seed(123)# Ensure reproducibility
 boruta_result_oversampled <- Boruta(Class ~ ., data = train_data_oversampled, doTrace = 2)
 boruta_result_oversampled
 # Plot Boruta feature selection results
@@ -514,7 +540,7 @@ length(selected_features_boruta_oversampled)
 
 # For undersampled
 # Run Boruta for feature selection
-set.seed(123)  # Ensure reproducibility
+set.seed(123)# Ensure reproducibility
 boruta_result_undersampled <- Boruta(Class ~ ., data = train_data_undersampled, doTrace = 2)
 boruta_result_undersampled
 # Plot Boruta feature selection results
@@ -537,27 +563,43 @@ apply_lasso_feature_selection <- function(data) {
   data$Class <- as.factor(data$Class)
   
   # Convert factor variables to numeric (direct mapping)
+<<<<<<< HEAD
   factor_columns <- sapply(data, is.factor)  # Identify factor columns
   data[factor_columns] <- lapply(data[factor_columns], as.numeric)  # Convert factors to numbers
   
   # Separate features (X) and target (y)
   X <- as.matrix(data[, -which(names(data) == "Class")])  # Exclude target
   y <- as.numeric(data$Class) - 1  # Convert target to binary (0/1)
+=======
+  factor_columns <- sapply(data, is.factor)# Identify factor columns
+  data[factor_columns] <- lapply(data[factor_columns], as.numeric)# Convert factors to numbers
+  
+  # Separate features (X) and target (y)
+  X <- as.matrix(data[, -which(names(data) == "Class")])# Exclude target
+  y <- as.numeric(data$Class) - 1# Convert target to binary (0/1)
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
   
   # Fit cross-validated Lasso logistic regression
-  set.seed(123)  # For reproducibility
+  set.seed(123)# For reproducibility
   cv_model <- cv.glmnet(
     X, 
     y, 
+<<<<<<< HEAD
     family = "binomial",  # For binary classification
     alpha = 1,            # Lasso penalty (L1 regularization)
     type.measure = "class",  # Classification error as metric
     standardize = TRUE    # Standardize features
+=======
+    family = "binomial",# For binary classification
+    alpha = 1,# Lasso penalty (L1 regularization)
+    type.measure = "class",# Classification error as metric
+    standardize = TRUE# Standardize features
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
   )
   
   # Extract non-zero coefficients at lambda.min (most predictive features)
   coefs <- coef(cv_model, s = "lambda.min")
-  selected_features <- rownames(coefs)[which(coefs != 0)][-1]  # Exclude intercept
+  selected_features <- rownames(coefs)[which(coefs != 0)][-1]# Exclude intercept
   
   return(list(
     selected_features = selected_features,
@@ -568,16 +610,25 @@ apply_lasso_feature_selection <- function(data) {
 # Apply function to oversampled data
 lasso_oversampled <- apply_lasso_feature_selection(train_data_oversampled)
 selected_features_lasso_oversampled <- lasso_oversampled$selected_features
+<<<<<<< HEAD
 length(selected_features_lasso_oversampled)
+=======
+selected_features_lasso_oversampled
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 
 # Apply function to undersampled data
 lasso_undersampled <- apply_lasso_feature_selection(train_data_undersampled)
 selected_features_lasso_undersampled <- lasso_undersampled$selected_features
+<<<<<<< HEAD
 length(selected_features_lasso_undersampled)
+=======
+selected_features_lasso_undersampled
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 
 
 
 # Create datasets
+<<<<<<< HEAD
 # Select only the columns in selected_features_info_gain_oversampled + Class column
 df1 <- train_data_oversampled[, c(selected_features_info_gain_oversampled, "Class"), drop = FALSE]
 dim(df1)
@@ -614,6 +665,44 @@ dim(df6_test)
 # Build models
 # Logistic Regression
 
+=======
+# Select only the columns in selected_features_info_gain_oversampled
+# Select only the chosen features + Class column
+df1 <- train_data_oversampled[, c(selected_features_info_gain_oversampled, "Class"), drop = FALSE]# Info Gain training Dataset - oversampled
+dim(df1)
+df1_test <- test_data[, c(selected_features_info_gain_oversampled, "Class"), drop = FALSE]#info gain test dataset -oversampled
+dim(df1_test)
+
+df2 <- train_data_undersampled[, c(selected_features_info_gain_undersampled, "Class"), drop = FALSE]#info gain training dataset - undersampled
+dim(df2)
+df2_test <- test_data[, c(selected_features_info_gain_undersampled, "Class"), drop = FALSE]#info gain test dataset - undersampled
+dim(df2_test)
+
+df3 <- train_data_oversampled[, c(selected_features_boruta_oversampled, "Class"), drop = FALSE]#boruta training dataset -oversampled
+dim(df3)
+df3_test <- test_data[, c(selected_features_boruta_oversampled, "Class"), drop = FALSE]#boruta test dataset - oversampled
+dim(df3_test)
+
+df4 <- train_data_undersampled[, c(selected_features_boruta_undersampled, "Class"), drop = FALSE]#boruta training dataset - undersampled
+dim(df4)
+df4_test <- test_data[, c(selected_features_boruta_undersampled, "Class"), drop = FALSE]#boruta test dataset - undersampled
+dim(df4_test)
+
+df5 <- train_data_oversampled[, c(selected_features_lasso_oversampled, "Class"), drop = FALSE]#lasso training dataset -oversampled
+dim(df5)
+df5_test <- test_data[, c(selected_features_lasso_oversampled, "Class"), drop = FALSE]#lasso test dataset - oversampled
+dim(df5_test)
+
+df6 <- train_data_undersampled[, c(selected_features_lasso_undersampled, "Class"), drop = FALSE]#lasso training dataset -undersampled
+dim(df6)
+df6_test <- test_data[, c(selected_features_lasso_undersampled, "Class"), drop = FALSE]#lasso test dataset - undersampled
+dim(df6_test)
+
+# Build models
+# Logistic Regression
+
+
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
 # Install required packages if not already installed
 if (!require("caret")) install.packages("caret", dependencies = TRUE)
 if (!require("pROC")) install.packages("pROC", dependencies = TRUE)
@@ -659,7 +748,11 @@ evaluate_model <- function(model, test_data, model_name) {
       1 - conf_matrix$byClass["Sensitivity"], 
       conf_matrix$byClass["Precision"], 
       conf_matrix$byClass["F1"], 
+<<<<<<< HEAD
       NA,  # ROC AUC is the same for both classes
+=======
+      NA,  # ROC AUC is the same for both classes
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
       mcc(actual, predicted), 
       conf_matrix$overall["Kappa"]
     ),
@@ -687,6 +780,7 @@ model_df3 <- glm(Class ~ ., data = df3, family = binomial)
 model_df4 <- glm(Class ~ ., data = df4, family = binomial)
 model_df5 <- glm(Class ~ ., data = df5, family = binomial)
 model_df6 <- glm(Class ~ ., data = df6, family = binomial)
+<<<<<<< HEAD
 
 # Evaluate models using corresponding test datasets
 metrics_df1 <- evaluate_model(model_df1, df1_test, "df1 (Info Gain Oversampled)")
@@ -1090,3 +1184,13 @@ evaluate_model(nb_model5, df5_test, "Naive Bayes - df5", "nb")
 nb_model6 <- naive_bayes(Class ~ ., data = df6)
 evaluate_model(nb_model6, df6_test, "Naive Bayes - df6", "nb")
 
+=======
+
+# Evaluate models using corresponding test datasets
+metrics_df1 <- evaluate_model(model_df1, df1_test, "df1 (Info Gain Oversampled)")
+metrics_df2 <- evaluate_model(model_df2, df2_test, "df2 (Info Gain Undersampled)")
+metrics_df3 <- evaluate_model(model_df3, df3_test, "df3 (Boruta Oversampled)")
+metrics_df4 <- evaluate_model(model_df4, df4_test, "df4 (Boruta Undersampled)")
+metrics_df5 <- evaluate_model(model_df5, df5_test, "df5 (LASSO Oversampled)")
+metrics_df6 <- evaluate_model(model_df6, df6_test, "df6 (LASSO Undersampled)")
+>>>>>>> 98cfb8c49dffdadff1c65323acf88bc09cba523a
