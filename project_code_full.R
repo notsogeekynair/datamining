@@ -757,7 +757,6 @@ model_df3 <- glm(Class ~ ., data = df3, family = binomial)
 model_df4 <- glm(Class ~ ., data = df4, family = binomial)
 model_df5 <- glm(Class ~ ., data = df5, family = binomial)
 model_df6 <- glm(Class ~ ., data = df6, family = binomial)
-<<<<<<< HEAD
 
 # Evaluate models using corresponding test datasets
 metrics_df1 <- evaluate_model(model_df1, df1_test, "df1 (Info Gain Oversampled)")
@@ -1170,4 +1169,3 @@ metrics_df3 <- evaluate_model(model_df3, df3_test, "df3 (Boruta Oversampled)")
 metrics_df4 <- evaluate_model(model_df4, df4_test, "df4 (Boruta Undersampled)")
 metrics_df5 <- evaluate_model(model_df5, df5_test, "df5 (LASSO Oversampled)")
 metrics_df6 <- evaluate_model(model_df6, df6_test, "df6 (LASSO Undersampled)")
-
