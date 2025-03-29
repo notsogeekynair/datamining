@@ -386,7 +386,7 @@ convert_columns_to_numeric <- function(data, exclude_col = "Class") {
 df_prep <- convert_columns_to_numeric(df_prep, exclude_col = "Class")
 
 # Set seed for reproducibility
-set.seed(123)
+set.seed(324)
 
 # Create a training/testing split (80% training, 20% testing)
 split <- sample.split(df$Class, SplitRatio = 0.8)
@@ -492,7 +492,7 @@ ggplot(sorted_info_gain_oversampled, aes(x = seq_along(importance), y = importan
   labs(title = "Information Gain Scree Plot", x = "Feature Rank", y = "Information Gain") +
   theme_minimal()
 
-N <- 15  # Keep top 15 features based on the elbow
+N <- 15# Keep top 15 features based on the elbow
 selected_features_info_gain_oversampled <- sorted_info_gain_oversampled[1:N, "attributes"]
 length(selected_features_info_gain_oversampled)
 
@@ -521,7 +521,7 @@ library(Boruta)
 
 # For oversampled
 # Run Boruta for feature selection
-set.seed(123)# Ensure reproducibility
+set.seed(324)# Ensure reproducibility
 boruta_result_oversampled <- Boruta(Class ~ ., data = train_data_oversampled, doTrace = 2)
 boruta_result_oversampled
 # Plot Boruta feature selection results
@@ -533,7 +533,7 @@ length(selected_features_boruta_oversampled)
 
 # For undersampled
 # Run Boruta for feature selection
-set.seed(123)# Ensure reproducibility
+set.seed(324)# Ensure reproducibility
 boruta_result_undersampled <- Boruta(Class ~ ., data = train_data_undersampled, doTrace = 2)
 boruta_result_undersampled
 # Plot Boruta feature selection results
@@ -571,18 +571,14 @@ apply_lasso_feature_selection <- function(data) {
   y <- as.numeric(data$Class) - 1# Convert target to binary (0/1)
   
   # Fit cross-validated Lasso logistic regression
-  set.seed(123)# For reproducibility
+  set.seed(324)# For reproducibility
   cv_model <- cv.glmnet(
     X, 
     y, 
     family = "binomial",  # For binary classification
     alpha = 1,            # Lasso penalty (L1 regularization)
     type.measure = "class",  # Classification error as metric
-    standardize = TRUE,    # Standardize features
-    family = "binomial",# For binary classification
-    alpha = 1,# Lasso penalty (L1 regularization)
-    type.measure = "class",# Classification error as metric
-    standardize = TRUE# Standardize features
+    standardize = TRUE   # Standardize features
   )
   
   # Extract non-zero coefficients at lambda.min (most predictive features)
@@ -643,7 +639,7 @@ dim(df6)
 df6_test <- test_data[, c(selected_features_lasso_undersampled, "Class"), drop = FALSE]
 dim(df6_test)
 
-
+df1_test$Class
 
 # Build models
 # Logistic Regression
@@ -654,7 +650,7 @@ df1 <- train_data_oversampled[, c(selected_features_info_gain_oversampled, "Clas
 dim(df1)
 df1_test <- test_data[, c(selected_features_info_gain_oversampled, "Class"), drop = FALSE]#info gain test dataset -oversampled
 dim(df1_test)
-
+df1_test$Class
 df2 <- train_data_undersampled[, c(selected_features_info_gain_undersampled, "Class"), drop = FALSE]#info gain training dataset - undersampled
 dim(df2)
 df2_test <- test_data[, c(selected_features_info_gain_undersampled, "Class"), drop = FALSE]#info gain test dataset - undersampled
@@ -693,62 +689,6 @@ library(caret)
 library(pROC)
 library(mltools)
 library(Metrics)
-
-# Function to evaluate model using test data
-evaluate_model <- function(model, test_data, model_name) {
-  
-  # Predict probabilities and class labels on test data
-  predictions_prob <- predict(model, newdata = test_data, type = "response")
-  predictions <- ifelse(predictions_prob > 0.5, "Yes", "No")
-  
-  # Convert to factors for confusion matrix
-  actual <- as.factor(test_data$Class)
-  predicted <- as.factor(predictions)
-  
-  # Confusion matrix
-  conf_matrix <- confusionMatrix(predicted, actual, positive = "Yes")
-  print(paste("Confusion Matrix for", model_name))
-  print(conf_matrix$table)
-  
-  # Extract performance metrics
-  results <- data.frame(
-    Metric = c("True Positive Rate (Recall)", "False Positive Rate", "Precision", 
-               "F1 Score", "ROC AUC", "MCC", "Kappa"),
-    Yes = c(
-      conf_matrix$byClass["Sensitivity"], 
-      1 - conf_matrix$byClass["Specificity"], 
-      conf_matrix$byClass["Precision"], 
-      conf_matrix$byClass["F1"], 
-      as.numeric(roc(actual, predictions_prob)$auc), 
-      mcc(actual, predicted), 
-      conf_matrix$overall["Kappa"]
-    ),
-    No = c(
-      conf_matrix$byClass["Specificity"], 
-      1 - conf_matrix$byClass["Sensitivity"], 
-      conf_matrix$byClass["Precision"], 
-      conf_matrix$byClass["F1"], 
-      NA,  # ROC AUC is the same for both classes
-      NA,# ROC AUC is the same for both classes
-      mcc(actual, predicted), 
-      conf_matrix$overall["Kappa"]
-    ),
-    Weighted_Avg = c(
-      mean(c(conf_matrix$byClass["Sensitivity"], conf_matrix$byClass["Specificity"])), 
-      mean(c(1 - conf_matrix$byClass["Specificity"], 1 - conf_matrix$byClass["Sensitivity"])), 
-      mean(c(conf_matrix$byClass["Precision"], conf_matrix$byClass["Precision"])), 
-      mean(c(conf_matrix$byClass["F1"], conf_matrix$byClass["F1"])), 
-      as.numeric(roc(actual, predictions_prob)$auc), 
-      mcc(actual, predicted), 
-      conf_matrix$overall["Kappa"]
-    )
-  )
-  
-  print(paste("Performance Metrics for", model_name))
-  print(results)
-  
-  return(results)
-}
 
 # Train models on training data
 model_df1 <- glm(Class ~ ., data = df1, family = binomial)
@@ -792,7 +732,7 @@ df5_xgb <- prepare_xgb_data(df5, df5_test)
 df6_xgb <- prepare_xgb_data(df6, df6_test)
 
 train_xgb_model <- function(train_matrix) {
-  set.seed(123)  # Ensure reproducibility
+  set.seed(324)  # Ensure reproducibility
   
   # Define XGBoost parameters
   params <- list(
@@ -912,7 +852,7 @@ df5_nn <- prepare_nn_data(df5, df5_test)
 df6_nn <- prepare_nn_data(df6, df6_test)
 
 train_nn_model <- function(train_data) {
-  set.seed(123)  # Ensure reproducibility
+  set.seed(324)  # Ensure reproducibility
   
   # Define formula for neural network (Class ~ all features)
   feature_names <- names(train_data)[-which(names(train_data) == "Class")]
@@ -1001,7 +941,7 @@ metrics_nn_df5 <- evaluate_nn_model(model_nn_df5, df5_nn$test, "df5 (LASSO Overs
 metrics_nn_df6 <- evaluate_nn_model(model_nn_df6, df6_nn$test, "df6 (LASSO Undersampled)")
 
 
-#Random Forest
+install.packages("mltools")
 
 # Load required packages
 library(caret)
@@ -1010,162 +950,688 @@ library(randomForest)
 library(e1071)
 library(naivebayes)
 library(mltools)
-install.packages("mltools")
-# Define the evaluation function
-evaluate_model <- function(model, test_data, model_name, model_type) {
+
+
+
+# Updated function to calculate performance metrics including AUC
+calculate_metrics <- function(cm, auc_value) {
+  # Extract values from the confusion matrix
+  tp_1 <- as.numeric(cm["1", "1"]) # True Positive for class 1
+  fp_1 <- as.numeric(cm["0", "1"]) # False Positive for class 1
+  tn_1 <- as.numeric(cm["0", "0"]) # True Negative for class 1
+  fn_1 <- as.numeric(cm["1", "0"]) # False Negative for class 1
   
-  # Get the class labels dynamically
-  class_labels <- levels(test_data$Class)
+  tp_0 <- as.numeric(cm["0", "0"]) # True Positive for class 0
+  fp_0 <- as.numeric(cm["1", "0"]) # False Positive for class 0
+  tn_0 <- as.numeric(cm["1", "1"]) # True Negative for class 0
+  fn_0 <- as.numeric(cm["0", "1"]) # False Negative for class 0
   
-  # Predict class labels or probabilities based on model type
-  if (model_type == "rf") {
-    predictions_prob <- predict(model, newdata = test_data, type = "prob")[, "1"]  # Positive class is "1"
-    predictions <- predict(model, newdata = test_data, type = "response")
-  } else if (model_type == "svm") {
-    predictions_prob <- attr(predict(model, newdata = test_data, probability = TRUE), "probabilities")[, "1"]
-    predictions <- predict(model, newdata = test_data)
-  } else if (model_type == "nb") {
-    predictions_prob <- predict(model, newdata = test_data, type = "prob")[, "1"]
-    predictions <- predict(model, newdata = test_data)
-  }
+  # Calculate performance metrics for class 1
+  tpr_1 <- tp_1 / (tp_1 + fn_1) # Sensitivity, Recall, or True Positive Rate (TPR)
+  fpr_1 <- fp_1 / (fp_1 + tn_1) # False Positive Rate (FPR)
+  precision_1 <- tp_1 / (tp_1 + fp_1) # Precision
+  recall_1 <- tpr_1 # Same as TPR
+  f_measure_1 <- 2 * (precision_1 * recall_1) / (precision_1 + recall_1) # F1-score
+  mcc_1 <- ((tp_1 * tn_1) - (fp_1 * fn_1)) / 
+    sqrt((tp_1 + fp_1) * (tp_1 + fn_1) * (tn_1 + fp_1) * (tn_1 + fn_1)) # MCC
+  kappa_1 <- 2 * (tp_1 * tn_1 - fp_1 * fn_1) / 
+    ((tp_1 + fn_1) * (fn_1 + tn_1) + (tp_1 + fp_1) * (fp_1 + tn_1)) # Kappa
   
-  # Convert predictions to factors for confusion matrix
-  actual <- as.factor(test_data$Class)
-  predicted <- as.factor(predictions)
+  # Calculate performance metrics for class 0
+  tpr_0 <- tp_0 / (tp_0 + fn_0)
+  fpr_0 <- fp_0 / (fp_0 + tn_0)
+  precision_0 <- tp_0 / (tp_0 + fp_0)
+  recall_0 <- tpr_0
+  f_measure_0 <- 2 * (precision_0 * recall_0) / (precision_0 + recall_0)
+  mcc_0 <- ((tp_0 * tn_0) - (fp_0 * fn_0)) / 
+    sqrt((tp_0 + fp_0) * (tp_0 + fn_0) * (tn_0 + fp_0) * (tn_0 + fn_0))
+  kappa_0 <- 2 * (tp_0 * tn_0 - fp_0 * fn_0) / 
+    ((tp_0 + fn_0) * (fn_0 + tn_0) + (tp_0 + fp_0) * (fp_0 + tn_0))
   
-  # Confusion matrix
-  conf_matrix <- confusionMatrix(predicted, actual, positive = "1")
-  print(paste("Confusion Matrix for", model_name))
-  print(conf_matrix$table)
+  # Simple average for class-wise metrics
+  avg_tpr <- (tpr_1 + tpr_0) / 2
+  avg_fpr <- (fpr_1 + fpr_0) / 2
+  avg_precision <- (precision_1 + precision_0) / 2
+  avg_recall <- (recall_1 + recall_0) / 2
+  avg_f_measure <- (f_measure_1 + f_measure_0) / 2
+  avg_mcc <- (mcc_1 + mcc_0) / 2
+  avg_kappa <- (kappa_1 + kappa_0) / 2
   
-  # Extract performance metrics
-  results <- data.frame(
-    Metric = c("True Positive Rate (Recall)", "False Positive Rate", "Precision", 
-               "F1 Score", "ROC AUC", "MCC", "Kappa"),
-    Yes = c(
-      conf_matrix$byClass["Sensitivity"], 
-      1 - conf_matrix$byClass["Specificity"], 
-      conf_matrix$byClass["Precision"], 
-      conf_matrix$byClass["F1"], 
-      as.numeric(roc(actual, predictions_prob)$auc), 
-      mcc(actual, predicted), 
-      conf_matrix$overall["Kappa"]
-    ),
-    No = c(
-      conf_matrix$byClass["Specificity"], 
-      1 - conf_matrix$byClass["Sensitivity"], 
-      conf_matrix$byClass["Precision"], 
-      conf_matrix$byClass["F1"], 
-      NA,  # ROC AUC is the same for both classes
-      mcc(actual, predicted), 
-      conf_matrix$overall["Kappa"]
-    ),
-    Weighted_Avg = c(
-      mean(c(conf_matrix$byClass["Sensitivity"], conf_matrix$byClass["Specificity"])), 
-      mean(c(1 - conf_matrix$byClass["Specificity"], 1 - conf_matrix$byClass["Sensitivity"])), 
-      mean(c(conf_matrix$byClass["Precision"], conf_matrix$byClass["Precision"])), 
-      mean(c(conf_matrix$byClass["F1"], conf_matrix$byClass["F1"])), 
-      as.numeric(roc(actual, predictions_prob)$auc), 
-      mcc(actual, predicted), 
-      conf_matrix$overall["Kappa"]
-    )
+  # Create performance metrics table
+  performance_table <- data.frame(
+    Class = c("Class 1", "Class 0", "Simple Avg"),
+    TPR = c(tpr_1, tpr_0, avg_tpr),
+    FPR = c(fpr_1, fpr_0, avg_fpr),
+    Precision = c(precision_1, precision_0, avg_precision),
+    Recall = c(recall_1, recall_0, avg_recall),
+    F_measure = c(f_measure_1, f_measure_0, avg_f_measure),
+    AUC = c(auc_value, auc_value, auc_value),  # Same AUC for all rows
+    MCC = c(mcc_1, mcc_0, avg_mcc),
+    Kappa = c(kappa_1, kappa_0, avg_kappa)
   )
   
-  print(paste("Performance Metrics for", model_name))
-  print(results)
-  
-  return(results)
+  # Return the performance table
+  return(performance_table)
 }
 
-levels(df1$Class)
-#Train and Predict
+#----------------------------------------------------------------RANDOM FOREST----------------------------------------------------------------
 
-# RF Model for df1
-rf_model1 <- randomForest(Class ~ ., data = df1)
-evaluate_model(rf_model1, df1_test, "Random Forest - df1", "rf")
+# --------------------------------------------RUN FROM BELOW FOR RANDOM FOREST USING DF1------------------------------------------
+set.seed(324)
+rf1 <- df1
+rf1_test <-df1_test
 
-# RF Model for df2
-rf_model2 <- randomForest(Class ~ ., data = df2)
-evaluate_model(rf_model2, df2_test, "Random Forest - df2", "rf")
+# Convert the Class variable to factor with correct levels for Random Forest
+rf1$Class <- factor(rf1$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+rf1_test$Class <- factor(rf1_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
 
-# RF Model for df3
-rf_model3 <- randomForest(Class ~ ., data = df3)
-evaluate_model(rf_model3, df3_test, "Random Forest - df3", "rf")
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE,classProbs = TRUE)
+tune_grid <- expand.grid(
+  mtry = c(15, 20, 40, 50)
+)
+rf_model1_tuned <- train(
+  Class ~ .,  
+  data = rf1,  
+  method = "rf",
+  trControl = control,
+  tuneGrid = tune_grid,
+  importance = TRUE,
+  metric = "Kappa"
+)
+print(rf_model1_tuned$bestTune)
+pred_prob <- predict(rf_model1_tuned,rf1_test,type="prob")
+roc_curve <- roc(response = rf1_test$Class, predictor = pred_prob[, "Class1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+# Generate the confusion matrix
+cm <- table(Actual = rf1_test$Class, Predicted = pred)
 
-# RF Model for df4
-rf_model4 <- randomForest(Class ~ ., data = df4)
-evaluate_model(rf_model4, df4_test, "Random Forest - df4", "rf")
+# Rename the confusion matrix labels back to "0" and "1"
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
 
-# RF Model for df5
-rf_model5 <- randomForest(Class ~ ., data = df5)
-evaluate_model(rf_model5, df5_test, "Random Forest - df5", "rf")
+# Print Confusion Matrix
+print("Confusion Matrix for df1 using Random Forest:")
+print(cm)
 
-# RF Model for df6
-rf_model6 <- randomForest(Class ~ ., data = df6)
-evaluate_model(rf_model6, df6_test, "Random Forest - df6", "rf")
-
-
-
-#SVM
-# SVM Model for df1
-svm_model1 <- svm(Class ~ ., data = df1, probability = TRUE)
-evaluate_model(svm_model1, df1_test, "SVM - df1", "svm")
-
-# SVM Model for df2
-svm_model2 <- svm(Class ~ ., data = df2, probability = TRUE)
-evaluate_model(svm_model2, df2_test, "SVM - df2", "svm")
-
-# SVM Model for df3
-svm_model3 <- svm(Class ~ ., data = df3, probability = TRUE)
-evaluate_model(svm_model3, df3_test, "SVM - df3", "svm")
-
-# SVM Model for df4
-svm_model4 <- svm(Class ~ ., data = df4, probability = TRUE)
-evaluate_model(svm_model4, df4_test, "SVM - df4", "svm")
-
-# SVM Model for df5
-svm_model5 <- svm(Class ~ ., data = df5, probability = TRUE)
-evaluate_model(svm_model5, df5_test, "SVM - df5", "svm")
-
-# SVM Model for df6
-svm_model6 <- svm(Class ~ ., data = df6, probability = TRUE)
-evaluate_model(svm_model6, df6_test, "SVM - df6", "svm")
-
-
-install.packages("naivebayes")
-
-library(naivebayes)
-#Naive Bayes
-# Naive Bayes Model for df1
-nb_model1 <- naive_bayes(Class ~ ., data = df1)
-evaluate_model(nb_model1, df1_test, "Naive Bayes - df1", "nb")
-
-# Naive Bayes Model for df2
-nb_model2 <- naive_bayes(Class ~ ., data = df2)
-evaluate_model(nb_model2, df2_test, "Naive Bayes - df2", "nb")
-
-# Naive Bayes Model for df3
-nb_model3 <- naive_bayes(Class ~ ., data = df3)
-evaluate_model(nb_model3, df3_test, "Naive Bayes - df3", "nb")
-
-# Naive Bayes Model for df4
-nb_model4 <- naive_bayes(Class ~ ., data = df4)
-evaluate_model(nb_model4, df4_test, "Naive Bayes - df4", "nb")
-
-# Naive Bayes Model for df5
-nb_model5 <- naive_bayes(Class ~ ., data = df5)
-evaluate_model(nb_model5, df5_test, "Naive Bayes - df5", "nb")
-
-# Naive Bayes Model for df6
-nb_model6 <- naive_bayes(Class ~ ., data = df6)
-evaluate_model(nb_model6, df6_test, "Naive Bayes - df6", "nb")
+# Calculate performance metrics using the same function
+print("Performance for df1 using Random Forest:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
 
 
 
-# Evaluate models using corresponding test datasets
-metrics_df1 <- evaluate_model(model_df1, df1_test, "df1 (Info Gain Oversampled)")
-metrics_df2 <- evaluate_model(model_df2, df2_test, "df2 (Info Gain Undersampled)")
-metrics_df3 <- evaluate_model(model_df3, df3_test, "df3 (Boruta Oversampled)")
-metrics_df4 <- evaluate_model(model_df4, df4_test, "df4 (Boruta Undersampled)")
-metrics_df5 <- evaluate_model(model_df5, df5_test, "df5 (LASSO Oversampled)")
-metrics_df6 <- evaluate_model(model_df6, df6_test, "df6 (LASSO Undersampled)")
+# --------------------------------------------RUN FROM BELOW FOR RANDOM FOREST USING DF2------------------------------------------
+set.seed(324)
+rf2 <- df2
+rf2_test <-df2_test
+
+# Convert the Class variable to factor with correct levels for Random Forest
+rf2$Class <- factor(rf2$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+rf2_test$Class <- factor(rf2_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE,classProbs = TRUE)
+tune_grid <- expand.grid(
+  mtry = c(15, 20, 40, 50)
+)
+rf_model2_tuned <- train(
+  Class ~ .,  
+  data = rf2,  
+  method = "rf",
+  trControl = control,
+  tuneGrid = tune_grid,
+  importance = TRUE,
+  metric = "Kappa"
+)
+print(rf_model2_tuned$bestTune)
+pred_prob <- predict(rf_model2_tuned,rf2_test,type="prob")
+roc_curve <- roc(response = rf2_test$Class, predictor = pred_prob[, "Class1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+# Generate the confusion matrix
+cm <- table(Actual = rf2_test$Class, Predicted = pred)
+
+# Rename the confusion matrix labels back to "0" and "1"
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+
+# Print Confusion Matrix
+print("Confusion Matrix for df2 using Random Forest:")
+print(cm)
+
+# Calculate performance metrics using the same function
+print("Performance for df2 using Random Forest:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+# --------------------------------------------RUN FROM BELOW FOR RANDOM FOREST USING DF3------------------------------------------
+set.seed(324)
+rf3 <- df3
+rf3_test <-df3_test
+
+# Convert the Class variable to factor with correct levels for Random Forest
+rf3$Class <- factor(rf3$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+rf3_test$Class <- factor(rf3_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE,classProbs = TRUE)
+tune_grid <- expand.grid(
+  mtry = c(15, 20, 40, 50)
+)
+rf_model3_tuned <- train(
+  Class ~ .,  
+  data = rf3,  
+  method = "rf",
+  trControl = control,
+  tuneGrid = tune_grid,
+  importance = TRUE,
+  metric = "Kappa"
+)
+print(rf_model3_tuned$bestTune)
+pred_prob <- predict(rf_model3_tuned,rf3_test,type="prob")
+roc_curve <- roc(response = rf3_test$Class, predictor = pred_prob[, "Class1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = rf3_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df3 using Random Forest:")
+print(cm)
+print("Performance for df3 using Random Forest:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+# --------------------------------------------RUN FROM BELOW FOR RANDOM FOREST USING DF4------------------------------------------
+set.seed(324)
+rf4 <- df4
+rf4_test <-df4_test
+
+# Convert the Class variable to factor with correct levels for Random Forest
+rf4$Class <- factor(rf4$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+rf4_test$Class <- factor(rf4_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE,classProbs = TRUE)
+tune_grid <- expand.grid(
+  mtry = c(1,5, 10, 15, 20)
+)
+rf_model4_tuned <- train(
+  Class ~ .,  
+  data = rf4,  
+  method = "rf",
+  trControl = control,
+  tuneGrid = tune_grid,
+  importance = TRUE
+)
+print(rf_model4_tuned$bestTune)
+pred_prob <- predict(rf_model4_tuned,rf4_test,type="prob")
+roc_curve <- roc(response = rf4_test$Class, predictor = pred_prob[, "Class1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = rf4_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df4 using Random Forest:")
+print(cm)
+print("Performance for df4 using Random Forest:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+# --------------------------------------------RUN FROM BELOW FOR RANDOM FOREST USING DF5------------------------------------------
+set.seed(324)
+rf5 <- df5
+rf5_test <-df5_test
+
+# Convert the Class variable to factor with correct levels for Random Forest
+rf5$Class <- factor(rf5$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+rf5_test$Class <- factor(rf5_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE,classProbs = TRUE)
+tune_grid <- expand.grid(
+  mtry = c(10, 20,25, 40,50)
+)
+rf_model5_tuned <- train(
+  Class ~ .,  
+  data = rf5,  
+  method = "rf",
+  trControl = control,
+  tuneGrid = tune_grid,
+  importance = TRUE,
+  metric = "Kappa"
+)
+print(rf_model5_tuned$bestTune)
+pred_prob <- predict(rf_model5_tuned,rf5_test,type="prob")
+roc_curve <- roc(response = rf5_test$Class, predictor = pred_prob[, "Class1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = rf5_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df5 using Random Forest:")
+print(cm)
+print("Performance for df5 using Random Forest:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+# --------------------------------------------RUN FROM BELOW FOR RANDOM FOREST USING DF6------------------------------------------
+set.seed(324)
+rf6 <- df6
+rf6_test <-df6_test
+
+# Convert the Class variable to factor with correct levels for Random Forest
+rf6$Class <- factor(rf6$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+rf6_test$Class <- factor(rf6_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE,classProbs = TRUE)
+tune_grid <- expand.grid(
+  mtry = c(15, 20, 40, 50)
+)
+rf_model6_tuned <- train(
+  Class ~ .,  
+  data = rf6,  
+  method = "rf",
+  trControl = control,
+  tuneGrid = tune_grid,
+  importance = TRUE,
+  metric = "Kappa"
+)
+print(rf_model6_tuned$bestTune)
+pred_prob <- predict(rf_model6_tuned,rf6_test,type="prob")
+roc_curve <- roc(response = rf6_test$Class, predictor = pred_prob[, "Class1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = rf6_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df6 using Random Forest:")
+print(cm)
+print("Performance for df6 using Random Forest:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+
+
+#----------------------------------------------------------------KNN---------------------------------------------------------------------
+
+
+# --------------------------------------------RUN FROM BELOW FOR KNN USING DF1------------------------------------------
+set.seed(324)
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE)
+tune_grid_knn <- expand.grid(
+  k = c(5, 7, 9, 11) 
+)
+
+knn_df1_tuned <- train(
+  Class ~ ., 
+  data = df1,
+  method = "knn",
+  trControl = control,
+  tuneGrid = tune_grid_knn
+)
+print(knn_df1_tuned$bestTune)
+pred_prob <- predict(knn_df1_tuned,df1_test,type="prob")
+roc_curve <- roc(response=df1_test$Class,predictor=pred_prob[,"1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "1"] > 0.5, "1", "0")
+cm <- table(Actual = df1_test$Class, Predicted = pred)
+print("Confusion Matrix for df1 using KNN : ")
+print(cm)
+print("Perfomance for df1 using KNN : ")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+
+#--------------------------------------------RUN FROM BELOW FOR KNN USING DF2------------------------------------------
+set.seed(324)
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE)
+tune_grid_knn <- expand.grid(
+  k = c(3, 5, 7, 9, 11) 
+)
+knn_df2_tuned <- train(
+  Class ~ ., 
+  data = df2,
+  method = "knn",
+  trControl = control,
+  tuneGrid = tune_grid_knn,
+  metric="Kappa"
+)
+print(knn_df2_tuned$bestTune)
+pred_prob <- predict(knn_df2_tuned,df2_test,type="prob")
+roc_curve <- roc(response=df2_test$Class,predictor=pred_prob[,"1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "1"] > 0.5, "1", "0")
+cm <- table(Actual = df2_test$Class, Predicted = pred)
+print("Confusion Matrix for df2 using KNN : ")
+print(cm)
+print("Perfomance for df2 using KNN : ")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+#--------------------------------------------RUN FROM BELOW FOR KNN USING DF3------------------------------------------
+set.seed(324)
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE)
+tune_grid_knn <- expand.grid(
+  k = c(3, 5, 7, 9, 11) 
+)
+knn_df3_tuned <- train(
+  Class ~ ., 
+  data = df3,
+  method = "knn",
+  trControl = control,
+  tuneGrid = tune_grid_knn,
+  metric="Kappa"
+)
+print(knn_df3_tuned$bestTune)
+pred_prob <- predict(knn_df3_tuned,df3_test,type="prob")
+roc_curve <- roc(response=df3_test$Class,predictor=pred_prob[,"1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "1"] > 0.5, "1", "0")
+cm <- table(Actual = df3_test$Class, Predicted = pred)
+print("Confusion Matrix for df3 using KNN : ")
+print(cm)
+print("Perfomance for df3 using KNN : ")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+#--------------------------------------------RUN FROM BELOW FOR KNN USING DF4------------------------------------------
+set.seed(324)
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE)
+tune_grid_knn <- expand.grid(
+  k = c(3, 5, 7, 9, 11) 
+)
+knn_df4_tuned <- train(
+  Class ~ ., 
+  data = df4,
+  method = "knn",
+  trControl = control,
+  tuneGrid = tune_grid_knn,
+  metric="Kappa"
+)
+print(knn_df4_tuned$bestTune)
+pred_prob <- predict(knn_df4_tuned,df4_test,type="prob")
+roc_curve <- roc(response=df4_test$Class,predictor=pred_prob[,"1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "1"] > 0.5, "1", "0")
+cm <- table(Actual = df4_test$Class, Predicted = pred)
+print("Confusion Matrix for df4 using KNN : ")
+print(cm)
+print("Perfomance for df4 using KNN : ")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+#--------------------------------------------RUN FROM BELOW FOR KNN USING DF5------------------------------------------
+set.seed(324)
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE)
+tune_grid_knn <- expand.grid(
+  k = c(3, 5, 7, 9, 11) 
+)
+knn_df5_tuned <- train(
+  Class ~ ., 
+  data = df5,
+  method = "knn",
+  trControl = control,
+  tuneGrid = tune_grid_knn,
+  metric="Kappa"
+)
+print(knn_df5_tuned$bestTune)
+pred_prob <- predict(knn_df5_tuned,df5_test,type="prob")
+roc_curve <- roc(response=df5_test$Class,predictor=pred_prob[,"1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "1"] > 0.5, "1", "0")
+cm <- table(Actual = df5_test$Class, Predicted = pred)
+print("Confusion Matrix for df5 using KNN : ")
+print(cm)
+print("Perfomance for df5 using KNN : ")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+#--------------------------------------------RUN FROM BELOW FOR KNN USING DF6------------------------------------------
+set.seed(324)
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE)
+tune_grid_knn <- expand.grid(
+  k = c(3, 5, 7, 9, 11) 
+)
+knn_df6_tuned <- train(
+  Class ~ ., 
+  data = df6,
+  method = "knn",
+  trControl = control,
+  tuneGrid = tune_grid_knn,
+  metric="Kappa"
+)
+print(knn_df6_tuned$bestTune)
+pred_prob <- predict(knn_df6_tuned,df6_test,type="prob")
+roc_curve <- roc(response=df5_test$Class,predictor=pred_prob[,"1"]) 
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "1"] > 0.5, "1", "0")
+cm <- table(Actual = df6_test$Class, Predicted = pred)
+print("Confusion Matrix for df6 using KNN : ")
+print(cm)
+print("Perfomance for df5 using KNN : ")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+#----------------------------------------------------------------SUPPORT VECTOR MACHINES----------------------------------------------------------------
+
+# --------------------------------------------RUN FROM BELOW FOR SVM USING DF1------------------------------------------
+set.seed(324)
+svm_df1 <- df1
+svm_df1_test <- df1_test
+svm_df1$Class <- factor(svm_df1$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+svm_df1_test$Class <- factor(svm_df1_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE, classProbs = TRUE)
+
+tune_grid <- expand.grid(
+  sigma = c(0.001, 0.01, 0.1),
+  C = c(0.01, 0.1, 1, 10)
+)
+svm_model1_tuned <- train(
+  Class ~ .,  
+  data = svm_df1,  
+  method = "svmRadial",
+  trControl = control,
+  tuneGrid = tune_grid,
+  preProcess = c("center", "scale"),  # Standardize features for SVM
+  metric = "Kappa"
+)
+print(svm_model1_tuned$bestTune)
+pred_prob <- predict(svm_model1_tuned, svm_df1_test, type = "prob")
+roc_curve <- roc(response = svm_df1_test$Class, predictor = pred_prob[, "Class1"])
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = svm_df1_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df1 using SVM:")
+print(cm)
+print("Performance for df1 using SVM:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+# --------------------------------------------RUN FROM BELOW FOR SVM USING DF2------------------------------------------
+set.seed(324)
+svm_df2 <- df2
+svm_df2_test <- df2_test
+svm_df2$Class <- factor(svm_df2$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+svm_df2_test$Class <- factor(svm_df2_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE, classProbs = TRUE)
+
+tune_grid <- expand.grid(
+  sigma = c(0.0001,0.001, 0.01, 0.1),
+  C = c(0.01, 0.1, 1, 10)
+)
+svm_model2_tuned <- train(
+  Class ~ .,  
+  data = svm_df2,  
+  method = "svmRadial",
+  trControl = control,
+  tuneGrid = tune_grid,
+  preProcess = c("center", "scale"),
+  metric="Kappa"
+)
+print(svm_model2_tuned$bestTune)
+pred_prob <- predict(svm_model2_tuned, svm_df2_test, type = "prob")
+roc_curve <- roc(response = svm_df2_test$Class, predictor = pred_prob[, "Class1"])
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = svm_df2_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df2 using SVM:")
+print(cm)
+print("Performance for df2 using SVM:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+# --------------------------------------------RUN FROM BELOW FOR SVM USING DF3------------------------------------------
+set.seed(324)
+svm_df3 <- df3
+svm_df3_test <- df3_test
+svm_df3$Class <- factor(svm_df3$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+svm_df3_test$Class <- factor(svm_df3_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE, classProbs = TRUE)
+
+tune_grid <- expand.grid(
+  sigma = c(0.001, 0.01, 0.1),
+  C = c(0.01, 0.1, 1, 10)
+)
+svm_model3_tuned <- train(
+  Class ~ .,  
+  data = svm_df3,  
+  method = "svmRadial",
+  trControl = control,
+  tuneGrid = tune_grid,
+  preProcess = c("center", "scale"),
+  metric="Kappa"
+)
+print(svm_model3_tuned$bestTune)
+pred_prob <- predict(svm_model3_tuned, svm_df3_test, type = "prob")
+roc_curve <- roc(response = svm_df3_test$Class, predictor = pred_prob[, "Class1"])
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = svm_df3_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df3 using SVM:")
+print(cm)
+print("Performance for df3 using SVM:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+# --------------------------------------------RUN FROM BELOW FOR SVM USING DF4------------------------------------------
+set.seed(324)
+svm_df4 <- df4
+svm_df4_test <- df4_test
+svm_df4$Class <- factor(svm_df4$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+svm_df4_test$Class <- factor(svm_df4_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE, classProbs = TRUE)
+
+tune_grid <- expand.grid(
+  sigma = c(0.001, 0.01, 0.1),
+  C = c(0.01, 0.1, 1, 10)
+)
+svm_model4_tuned <- train(
+  Class ~ .,  
+  data = svm_df4,  
+  method = "svmRadial",
+  trControl = control,
+  tuneGrid = tune_grid,
+  preProcess = c("center", "scale"),
+  metric="Kappa"
+)
+print(svm_model4_tuned$bestTune)
+pred_prob <- predict(svm_model4_tuned, svm_df4_test, type = "prob")
+roc_curve <- roc(response = svm_df4_test$Class, predictor = pred_prob[, "Class1"])
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = svm_df4_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df4 using SVM:")
+print(cm)
+print("Performance for df4 using SVM:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+# --------------------------------------------RUN FROM BELOW FOR SVM USING DF5------------------------------------------
+set.seed(324)
+svm_df5 <- df5
+svm_df5_test <- df5_test
+svm_df5$Class <- factor(svm_df5$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+svm_df5_test$Class <- factor(svm_df5_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE, classProbs = TRUE)
+
+tune_grid <- expand.grid(
+  sigma = c(0.001, 0.01, 0.1),
+  C = c(0.01, 0.1, 1, 10)
+)
+svm_model5_tuned <- train(
+  Class ~ .,  
+  data = svm_df5,  
+  method = "svmRadial",
+  trControl = control,
+  tuneGrid = tune_grid,
+  preProcess = c("center", "scale"),
+  metric="Kappa"
+)
+print(svm_model5_tuned$bestTune)
+pred_prob <- predict(svm_model5_tuned, svm_df5_test, type = "prob")
+roc_curve <- roc(response = svm_df5_test$Class, predictor = pred_prob[, "Class1"])
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = svm_df5_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df5 using SVM:")
+print(cm)
+print("Performance for df5 using SVM:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+# --------------------------------------------RUN FROM BELOW FOR SVM USING DF6------------------------------------------
+set.seed(324)
+svm_df6 <- df6
+svm_df6_test <- df6_test
+svm_df6$Class <- factor(svm_df6$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+svm_df6_test$Class <- factor(svm_df6_test$Class, levels = c(0, 1), labels = c("Class0", "Class1"))
+
+control <- trainControl(method = "cv", number = 10, verboseIter = FALSE, classProbs = TRUE)
+
+tune_grid <- expand.grid(
+  sigma = c(0.001, 0.01, 0.1),
+  C = c(0.01, 0.1, 1, 10)
+)
+svm_model6_tuned <- train(
+  Class ~ .,  
+  data = svm_df6,  
+  method = "svmRadial",
+  trControl = control,
+  tuneGrid = tune_grid,
+  preProcess = c("center", "scale")
+)
+print(svm_model6_tuned$bestTune)
+pred_prob <- predict(svm_model6_tuned, svm_df6_test, type = "prob")
+roc_curve <- roc(response = svm_df6_test$Class, predictor = pred_prob[, "Class1"])
+auc_value <- roc_curve$auc
+pred <- ifelse(pred_prob[, "Class1"] > 0.5, "Class1", "Class0")
+cm <- table(Actual = svm_df6_test$Class, Predicted = pred)
+rownames(cm) <- c("0", "1")
+colnames(cm) <- c("0", "1")
+print("Confusion Matrix for df6 using SVM:")
+print(cm)
+print("Performance for df6 using SVM:")
+metrics_table <- calculate_metrics(cm, auc_value)
+print(metrics_table)
+
+
+
